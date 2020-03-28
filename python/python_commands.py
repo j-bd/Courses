@@ -94,4 +94,153 @@ a.T
 
 
 
+# =============================================================================
+# PANDAS COMMAND
+# =============================================================================
 
+import pandas as pd
+import seaborn as sns
+
+url = "http://www.lpsm.paris/pageperso/bousquet/yotta/data/villes-belges.csv"
+df = pd.read_csv(url,index_col='Commune')
+
+"Produire un résumé global des donnée"
+print(df.info())
+df.shape
+
+"produire un descriptif plus fin des données"
+print(df.describe(include='all'))
+
+"affichage"
+pd.options.display.max_columns = 10
+pd.options.display.max_rows = 10
+print(df.head()) #haut du tableau
+print(df.tail()) #bas du tableau
+
+"Enumeration des colonnes"
+df.columns
+
+"Type de chaque colonne"
+print(df.dtypes)
+
+"Statistiques descriptives par colonne"
+df.describe()
+
+"Accédez simultanément aux colonnes col1 et col2"
+df[['col1','col2']]
+"Calculez les moyennes et comptages pour une colonne"
+print(df['col1'].mean())
+print(df['col2'].value_counts())
+
+"On souhaite appliquer à toutes les variables un ensemble de mêmes fonctions"
+"(par exemple la moyenne)"
+import numpy as np
+def operation(x):
+    return (x.mean())
+resultat = df.select_dtypes(exclude=['object']).apply(operation,axis=0)
+print(resultat)
+
+"tri généralisé aux DataFrame"
+df.sort_values(by='col1')
+
+"scission des données"
+g = df.groupby("col_1")
+g.get_group("val")
+
+"Calculer différentes fonctions à des variables via la fonction .agg(),"
+"telle la moyenne et l'écart-type"
+g[['col_2','col_3']].agg([pd.Series.mean,pd.Series.std])
+
+
+"Tracé d'histogramme et de densité"
+df.hist(column='col1')
+df.col1.plot.hist()#autre solution
+
+"histogramme des fréquences"
+df.hist(column='col1',density=True)
+
+"estimateur à noyaux de la densité avec la fonction"
+df['col1'].plot.kde() # voir egalement https://scikit-learn.org/stable/modules/density.html
+
+"histogramme de la distribution des revenus moyens par commune selon les provinces"
+df.hist(column='averageincome',by="Province",figsize=(10, 10))
+
+"commande utiles pour varier le tracé des histogrammes:"
+"http://www.python-simple.com/python-matplotlib/histogram.php"
+
+
+"Tracé de la fonction de répartition empirique"
+from statsmodels.distributions.empirical_distribution import ECDF
+
+sample = df['averageincome']# toute la Belgique
+
+prov_Anvers = df.loc[df['Province']=='Anv.',:]
+sample2 = prov_Anvers['averageincome'] # province d'Anvers seulement
+
+ecdf = ECDF(sample)
+x = np.linspace(min(sample), max(sample)) # trace une grille régulière de valeurs entre 2 bornes
+y = ecdf(x)
+
+ecdf2 = ECDF(sample2)
+y2 = ecdf2(x)
+
+figure = plt.figure(figsize = (10, 6))
+plt.gcf().subplots_adjust(left = 0.2, bottom = 0.2, right = 0.9, top = 0.9, wspace = 0.5, hspace = 0)
+plt.subplot(1, 2, 1)
+plt.step(x, y)
+plt.xlabel('Ensemble de la Belgique')
+plt.subplot(1, 2, 2)
+plt.step(x, y2)
+plt.xlabel('Région d''Anvers')
+plt.suptitle('Fonction de répartition empirique : revenus médians')
+plt.show()
+
+"fonctions dans la librairie PyLab pour représenter des courbes superposées"
+# https://courspython.com/introduction-courbes.html
+
+
+"QQ-plot"
+import scipy.stats as stats
+import pylab
+
+# Lister les provinces
+prov = np.unique(df.Province)
+
+# On fait une boucle sur la liste des provinces
+for p in prov:
+    data = df[df['Province']==p]
+    x = data['averageincome']
+    figure = plt.figure(figsize = (5, 3))
+    stats.probplot(x,dist="norm",plot=pylab)
+    pylab.title(str(p))
+    pylab.show()
+
+"Calcul de quantile empirique"
+np.percentile(df['averageincome'], [1/4, 1/2,3/4])
+
+"Calcul de variance et dispersion"
+variance = np.var(df['medianincome'])
+ecart_type = np.std(df['medianincome'])
+
+# Calcul de l'écart inter-quartiles
+quantiles = np.percentile(df['averageincome'],[25,75])
+IQR = quantiles[1]- quantiles[0]
+
+
+"Boîtes à moustaches (boxplots) et violin plots"
+fig1, ax1 = plt.subplots()
+ax1.set_title('Boîte à moustaches basique')
+ax1.boxplot(df['medianincome'])
+fig2, ax2 = plt.subplots()
+ax2.set_title('Boîte à moustaches "crantée"')
+ax2.boxplot(df['medianincome'], notch=True)
+
+"représenter l'étalement des revenus par province "
+df.boxplot(column='medianincome',by="Province",figsize=(10, 10))
+#violin plot
+g = sns.catplot(x='Province',y='medianincome',kind='violin',data=df,size=10)
+sns.swarmplot(x='Province',y='medianincome',color='k',size=3,data=df,ax=g.ax)
+#violin plot
+figure = plt.figure(figsize = (10, 10))
+sns.set(style="whitegrid")
+ax = sns.violinplot(x="Province",y='medianincome',data=df,inner="quartile")
