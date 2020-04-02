@@ -244,3 +244,24 @@ sns.swarmplot(x='Province',y='medianincome',color='k',size=3,data=df,ax=g.ax)
 figure = plt.figure(figsize = (10, 10))
 sns.set(style="whitegrid")
 ax = sns.violinplot(x="Province",y='medianincome',data=df,inner="quartile")
+
+
+
+
+
+# =============================================================================
+# Statistics
+# =============================================================================
+
+"Loi normale"
+from scipy.stats import norm
+import matplotlib.pyplot as plt
+
+def loi_normale(x,mu = 0 ,sigma = 1):
+    return norm.pdf(x,loc = mu, scale=sigma)
+
+x = np.arange(-10,10,0.1)
+y = loi_normale(x)
+plt.plot(x,y)
+
+
