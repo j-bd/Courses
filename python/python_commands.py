@@ -137,7 +137,11 @@ df.info()
 df.columns
 df.isnull().sum(axis=0)
 df.head()
-df.nunique() #nb unique value for each column
+df.nunique(dropna = False) #nb unique value for each column
+
+
+'Vérifier si des lignes en doublon existent (les valeurs de toutes les colonnes sont les mêmes dans ce cas)'
+print(len(df.iloc[pd.Series(df.duplicated(keep = False)).loc[lambda x : x==True].index]))
 
 
 
@@ -169,6 +173,41 @@ g.get_group("val")
 g[['col_2','col_3']].agg([pd.Series.mean,pd.Series.std])
 
 
+"Créer une colonne 'rented' représentant l'addition de 2 colonnes que vous supprimez"
+columns_to_exclude = ['casual', 'registered']
+df['rented'] = df['casual'] + df['registered']
+df.drop(columns_to_exclude, axis=1, inplace=True)
+
+
+" Transformer les variables qui devraient être catégorielles en variables de type catégoriel"
+categoryVariableList = ["season","weather","holiday","workingday"]
+for var in categoryVariableList:
+    df[var] = df[var].astype("category")
+
+
+" Transformer les variables temporelles (datetime et date) en variables de type date ou datetime"
+import calendar
+from datetime import datetime
+df["date"] = df.datetime.apply(lambda x : x.split(" ")[0])
+df["hour"] = df.datetime.apply(lambda x : x.split()[1].split(":")[0])
+df["weekday"] = df.date.apply(
+    lambda dateString : calendar.day_name[datetime.strptime(dateString,"%Y-%m-%d").weekday()]
+)
+df["month"] = df.date.apply(
+    lambda dateString : calendar.month_name[datetime.strptime(dateString,"%Y-%m-%d").month]
+)
+
+
+df['datetime'] = pd.to_datetime(df['datetime'], format='%Y-%m-%d %H:%M:%S')
+df['date'] = pd.to_datetime(df['date'], format='%Y-%m-%d')
+df["weekday"] = df['datetime'].dt.day_name()
+df["month"] = df['datetime'].dt.month_name()
+
+"Vérifier que la colonne datetime consitue bien un identifiant de ligne"
+print(df.datetime.nunique() == df.shape[0])
+
+"Calculer le nombre total des locations initiées par les utilisateurs entre le 12-03-2011 et le 15-03-2011"
+df.loc[(df['date']>='2011-03-12') & (df['date']<='2011-03-15')].rented.sum()
 
 
 # GRAPH
