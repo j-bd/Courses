@@ -153,6 +153,10 @@ missing_values_pourc[missing_values_pourc>0].sort_values(ascending = False)
 'Drop'
 col_list = [idx for idx, val in missing_values_pourc.iteritems() if val >= 60]
 df = df.drop(columns=col_list)
+'imputer les valeurs manquantes avec le mode'
+data_columns = df.columns
+for col in data_columns:
+    df[col].fillna(df[col].mode()[0],inplace = True)
 
 
 
