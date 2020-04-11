@@ -280,9 +280,3 @@ corrMatt = df[quantitatives_cols].corr()
 sn.heatmap(corrMatt,vmax=.8, square=True,annot=True)
 
 
-
-
-# OUTLIERS
-
-
-
