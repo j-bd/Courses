@@ -99,7 +99,8 @@ a.T
 # =============================================================================
 
 import pandas as pd
-import seaborn as sns
+
+# OVERVIEW
 
 url = "http://www.lpsm.paris/pageperso/bousquet/yotta/data/villes-belges.csv"
 df = pd.read_csv(url,index_col='Commune')
@@ -126,6 +127,22 @@ print(df.dtypes)
 "Statistiques descriptives par colonne"
 df.describe()
 
+"Valeur nulle par colonne"
+print(df.isnull().sum(axis=0))
+
+
+"final block for global overview"
+df.describe()
+df.info()
+df.columns
+df.isnull().sum(axis=0)
+df.head()
+df.nunique() #nb unique value for each column
+
+
+
+# PREPROCESS
+
 "Accédez simultanément aux colonnes col1 et col2"
 df[['col1','col2']]
 "Calculez les moyennes et comptages pour une colonne"
@@ -134,7 +151,7 @@ print(df['col2'].value_counts())
 
 "On souhaite appliquer à toutes les variables un ensemble de mêmes fonctions"
 "(par exemple la moyenne)"
-import numpy as np
+
 def operation(x):
     return (x.mean())
 resultat = df.select_dtypes(exclude=['object']).apply(operation,axis=0)
@@ -151,6 +168,10 @@ g.get_group("val")
 "telle la moyenne et l'écart-type"
 g[['col_2','col_3']].agg([pd.Series.mean,pd.Series.std])
 
+
+
+
+# GRAPH
 
 "Tracé d'histogramme et de densité"
 df.hist(column='col1')
