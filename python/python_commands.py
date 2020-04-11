@@ -211,7 +211,7 @@ df.loc[(df['date']>='2011-03-12') & (df['date']<='2011-03-15')].rented.sum()
 
 
 # GRAPH
-
+import seaborn as sn
 "Tracé d'histogramme et de densité"
 df.hist(column='col1')
 df.col1.plot.hist()#autre solution
@@ -229,11 +229,59 @@ df.hist(column='averageincome',by="Province",figsize=(10, 10))
 "http://www.python-simple.com/python-matplotlib/histogram.php"
 
 
+"""
+Visualiser :
+
+    La distribution mensuelle des locations par mois
+    La distribution horaire des locations en fonction des saisons
+    La distribution horaire des locations en fonction des jours de la semaine
+"""
+fig,(ax1,ax2,ax3)= plt.subplots(nrows=3)
+fig.set_size_inches(12,20)
+sortOrder = ["January","February","March","April","May","June","July","August","September","October","November","December"]
+hueOrder = ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"]
+
+monthAggregated = pd.DataFrame(df.groupby("month")["rented"].mean()).reset_index()
+monthSorted = monthAggregated.sort_values(by="rented",ascending=False)
+sn.barplot(data=monthSorted,x="month",y="rented",ax=ax1,order=sortOrder)
+ax1.set(xlabel='Month', ylabel='Avearage Rented',title="Average Rount By Month")
+
+hourAggregated = pd.DataFrame(df.groupby(["hour","season"],sort=True)["rented"].mean()).reset_index()
+sn.pointplot(
+    x=hourAggregated["hour"], y=hourAggregated["rented"],hue=hourAggregated["season"],
+    data=hourAggregated, join=True,ax=ax2
+)
+ax2.set(
+    xlabel='Hour Of The Day', ylabel='Rented',title="Average By Hour Of The Day Across Season",label='big'
+)
+
+hourAggregated = pd.DataFrame(df.groupby(["hour","weekday"],sort=True)["rented"].mean()).reset_index()
+sn.pointplot(
+    x=hourAggregated["hour"], y=hourAggregated["rented"],hue=hourAggregated["weekday"],
+    hue_order=hueOrder, data=hourAggregated, join=True,ax=ax3
+)
+ax3.set(
+    xlabel='Hour Of The Day', ylabel='Rented',title="Average By Hour Of The Day Across Weekdays",
+    label='big'
+)
+
+
+"Etudier les relations entre les différentes variables. Quelles variables sont "
+"très corrélées ? Visualiser ces corrélations grâce à la fonction heatmap de seaborn"
+quantitatives_cols = ['temp', 'atemp', 'humidity', 'windspeed', 'rented']
+sn.pairplot(
+    df[quantitatives_cols], diag_kind="hist",
+    plot_kws = {'alpha': 0.6, 's': 80, 'edgecolor': 'k'}, height = 4
+)
+
+corrMatt = df[quantitatives_cols].corr()
+sn.heatmap(corrMatt,vmax=.8, square=True,annot=True)
+
 
 
 
 # OUTLIERS
-import seaborn as sn
+
 " Catégoriser les outliers de la population du label ==> Proposer un petit script"
 " pour visualiser les outliers sur la variable cible."
 fig, axes = plt.subplots(nrows=2,ncols=2)
