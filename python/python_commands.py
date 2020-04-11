@@ -145,6 +145,20 @@ print(len(df.iloc[pd.Series(df.duplicated(keep = False)).loc[lambda x : x==True]
 
 
 
+
+
+# MISSING VALUES
+missing_values_pourc = df.isnull().sum()/len(df)*100
+missing_values_pourc[missing_values_pourc>0].sort_values(ascending = False)
+'Drop'
+col_list = [idx for idx, val in missing_values_pourc.iteritems() if val >= 60]
+df = df.drop(columns=col_list)
+
+
+
+
+
+
 # PREPROCESS
 
 "Accédez simultanément aux colonnes col1 et col2"
