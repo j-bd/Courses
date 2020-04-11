@@ -227,3 +227,34 @@ df.hist(column='averageincome',by="Province",figsize=(10, 10))
 
 "commande utiles pour varier le tracé des histogrammes:"
 "http://www.python-simple.com/python-matplotlib/histogram.php"
+
+
+
+
+
+# OUTLIERS
+import seaborn as sn
+" Catégoriser les outliers de la population du label ==> Proposer un petit script"
+" pour visualiser les outliers sur la variable cible."
+fig, axes = plt.subplots(nrows=2,ncols=2)
+fig.set_size_inches(12, 10)
+sn.boxplot(data=df,y="rented",orient="v",ax=axes[0][0])
+sn.boxplot(data=df,y="rented",x="season",orient="v",ax=axes[0][1])
+sn.boxplot(data=df,y="rented",x="hour",orient="v",ax=axes[1][0])
+sn.boxplot(data=df,y="rented",x="workingday",orient="v",ax=axes[1][1])
+
+axes[0][0].set(ylabel='rented',title="Box Plot On Count")
+axes[0][1].set(xlabel='Season', ylabel='rented',title="Box Plot On Count Across Season")
+axes[1][0].set(xlabel='Hour Of The Day', ylabel='rented',title="Box Plot On Count Across Hour Of The Day")
+axes[1][1].set(xlabel='Working Day', ylabel='rented',title="Box Plot On Count Across Working Day")
+
+"méthode pour filtrer ces données anormales (Par exemple en utilisant la variance"
+" de la distribution). Combien d'outliers à-t-on filtré ?:"
+
+dailyDataWithoutOutliers = df[
+    np.abs(df["rented"] - df["rented"].mean()) <= (3 * df["rented"].std())
+]
+
+print ("Shape of the dataframe before ouliers removal: ",df.shape)
+print ("Shape of the dataframe after ouliers removal: ",dailyDataWithoutOutliers.shape)
+
