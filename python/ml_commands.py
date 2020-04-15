@@ -56,11 +56,20 @@ print ("Shape of the dataframe before ouliers removal: ",df.shape)
 print ("Shape of the dataframe after ouliers removal: ",dailyDataWithoutOutliers.shape)
 
 
+# =============================================================================
+# DATA CLEANING
+# =============================================================================
+
+df['class'].replace(["Iris-setossa","versicolor"], ["Iris-setosa","Iris-versicolor"], inplace=True)
 
 
 # =============================================================================
 # Graph
 # =============================================================================
+"si les variables explicatives sont toutes quantitatives et les colonnes peu nombreuses"
+sns.pairplot(df, hue='target', size=2.5)
+
+
 
 "Tracé de la fonction de répartition empirique"
 from statsmodels.distributions.empirical_distribution import ECDF
@@ -158,6 +167,70 @@ y = loi_normale(x)
 plt.plot(x,y)
 
 
+'''Pearson/Spearman'''
+from scipy.stats import  pearsonr, spearmanr
+
+
+def correlation_tests(dataframe, x1, x2, alpha = 0.05, test = 'pearson'):
+  if test not in ['pearson', 'spearman'] :
+    print('Error - please specify a correct test : Pearson, Spearman')
+
+  if test == 'pearson' :
+    pearson_corr, pearson_p_value = pearsonr(dataframe[x1], dataframe[x2])
+    print('\nPerson correlation :')
+    print('====================')
+    print('correlation : {}, p_value : {:.5E}'.format(pearson_corr, pearson_p_value))
+    if pearson_p_value < 0.05 :
+      print('Person correlation results : Dependent (reject H0)')
+    else :
+      print('Person correlation results : Independent (fail to reject H0). No evidence of a linear relatioship.')
+
+  if test == 'spearman' :
+    spearman_corr, spearman_p_value = spearmanr(dataframe[x1], dataframe[x2])
+    print('\nSpearman correlation :')
+    print('======================')
+    print('correlation : {}, p_value : {:.5E}'.format(spearman_corr, spearman_p_value))
+    if spearman_p_value < 0.05 :
+      print('Spearman correlation results : Dependent (reject H0)')
+    else :
+      print('Spearman correlation results : Independent (fail to reject H0). No evidence of a monotonic relatioship')
+
+
+'''Chie2'''
+from scipy.stats import chi2_contingency,chi2
+
+def chi_square_independence_test(dataframe, x1, x2, alpha ) :
+  '''
+  Function that conductes Pearson’s Chi-Squared of independance
+
+  Arguments
+  =========
+  dataframe : pandas dataframe
+  x1 : str. First variable
+  x2 : str. Second variable
+  alpha : float, significance treshold
+
+  Returns
+  =======
+  stat, p, dof
+  if dependent or not
+  '''
+
+
+  print('\nPearson’s Chi-Squared Test :')
+  print('============================')
+  stat, p, dof, expected = chi2_contingency(pd.crosstab(dataframe[x1], dataframe[x2]).values)
+  print('stat : {}, p : {:.5E}, dof : {}'.format(stat,p, dof))
+
+  # interpret test-statistic
+  if p <= alpha:
+    print('Dependent (reject H0)')
+  else:
+      print('Independent (fail to reject H0)')
+
+
+
+
 # =============================================================================
 # MISSING VALUES
 # =============================================================================
@@ -170,6 +243,9 @@ df = df.drop(columns=col_list)
 data_columns = df.columns
 for col in data_columns:
     df[col].fillna(df[col].mode()[0],inplace = True)
+
+"suppression de ligne"
+df.dropna(axis=0, inplace=True)
 
 
 # =============================================================================
