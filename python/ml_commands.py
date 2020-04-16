@@ -229,7 +229,28 @@ def chi_square_independence_test(dataframe, x1, x2, alpha ) :
       print('Independent (fail to reject H0)')
 
 
+'''Kruskal-Wallis'''
+#Ho:same distributions -> independant
 
+from scipy.stats import kruskal
+
+df_kw = df[['va1', 'va2']].dropna()
+
+df_kw_1 = df_kw[df_kw['var1'] == 'A'].var2
+df_kw_2 = df_kw[df_kw['var2'] == 'B'].var2
+df_kw_3 = df_kw[df_kw['var3'] == 'C'].var2
+df_kw_4 = df_kw[df_kw['var4'] == 'D'].var2
+
+stat, p = kruskal(df_kw_1, df_kw_2, df_kw_3, df_kw_4)
+print('Statistics=%.3f, p=%.3f' % (stat, p))
+
+#interpret
+alpha = 0.05
+
+if p > alpha:
+    print('Same distribution (fail to reject H0) -> independant')
+else:
+    print('Different distributions (reject H0) -> Dependant')
 
 # =============================================================================
 # MISSING VALUES
