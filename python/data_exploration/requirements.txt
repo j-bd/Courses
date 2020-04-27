@@ -1,0 +1,11 @@
+pandas
+pandas_profiling
+
+sklearn
+matplotlib
+seaborn
+tabulate
+imblearn
+pyarrow
+scikit-optimize
+joblib
