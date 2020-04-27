@@ -6,6 +6,12 @@ Created on Thu Mar 19 08:37:50 2020
 @author: j-bd
 """
 
+# =============================================================================
+# Global in terminal command
+# =============================================================================
+python --version
+
+
 
 # =============================================================================
 # NUMPY COMMAND
@@ -278,5 +284,28 @@ sn.pairplot(
 
 corrMatt = df[quantitatives_cols].corr()
 sn.heatmap(corrMatt,vmax=.8, square=True,annot=True)
+
+
+
+# =============================================================================
+# Pure python
+# =============================================================================
+from dataclasses import dataclass, field
+from sklearn.base import BaseEstimator, TransformerMixin
+
+import forecast.settings as stg
+
+
+@dataclass
+class DateTransformer(BaseEstimator, TransformerMixin):
+    input_df: pd.DataFrame
+    X: pd.DataFrame = field(init=False)
+    y: pd.DataFrame = field(init=False)
+
+
+    def __post_init__(self):
+        self.X = self.input_df.drop(columns=[stg.DATA_SUBSCRIPTION])
+        self.y = self.input_df[stg.DATA_SUBSCRIPTION]
+
 
 
