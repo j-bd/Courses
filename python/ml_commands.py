@@ -25,7 +25,9 @@ df.isnull().sum(axis=0)
 df.head()
 df.nunique(dropna = False) #nb unique value for each column
 
-
+from pandas_profiling import ProfileReport
+profile = ProfileReport(df, title='Pandas Profiling Report', html={'style':{'full_width':True}})
+profile.to_file(output_file="your_report.html")
 
 # =============================================================================
 # OUTLIERS
